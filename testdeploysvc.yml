@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aws9deploy
+spec:
+  strategy:
+    type: RollingUpdate
+  replicas: 10
+  selector:
+    matchLabels:
+      app: web # pod 작성시 이 부분(label -> app: web)이 포함 되어야 함
+  template: #여기에서 부터 Pod 작성
+    metadata:
+      labels:
+        app: web # 반드시 위 정의한 것과 같아야 함
+    spec:
+      containers:
+        - name: aws9ctn
+          image: jaeki900/aws9:blue
+        
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: aws9svc
+spec: 
+  type: NodePort
+  ports:
+  - name: aws9-port
+    port: 8080 # client port
+    protocol: TCP
+    targetPort: 80 # pod port
+    nodePort: 30080 # node port
+  selector:
+    app: web # pod 작성시 이 부분(label -> app: web)이 포함 되어야 함
